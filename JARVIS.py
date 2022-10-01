@@ -1079,68 +1079,6 @@ class MainThread(QThread):
 
 
 
-
-
-
-
-##______________________________________________________________J A R V I S ( U I )____________________________________________________##
-
-
-startExecution = MainThread()
-class Main(QMainWindow):
-    
-    def __init__(self):
-        super().__init__()
-        self.ui = Ui_JarvisUI()
-        self.ui.setupUi(self)
-        self.ui.pushButton_4.clicked.connect(self.startTask)
-        self.ui.pushButton_3.clicked.connect(self.close)
-    
-    #NOTE make sure to place a correct path where you are keeping this gifs
-    def startTask(self):
-        self.ui.movie = QtGui.QMovie("C:\\Users\\avina\\Desktop\\AI Program\\Images\\ironman1.gif")
-        self.ui.label_2.setMovie(self.ui.movie)
-        self.ui.movie.start()
-        self.ui.movie = QtGui.QMovie("")
-        self.ui.label_3.setMovie(self.ui.movie)
-        self.ui.movie.start()
-        self.ui.movie = QtGui.QMovie("C:\\Users\\avina\\Desktop\\AI Program\\Images\\circle.gif")
-        self.ui.label_4.setMovie(self.ui.movie)
-        self.ui.movie.start()
-        self.ui.movie = QtGui.QMovie("C:\\Users\\avina\\Desktop\\AI Program\\Images\\lines1.gif")
-        self.ui.label_7.setMovie(self.ui.movie)
-        self.ui.movie.start()
-        self.ui.movie = QtGui.QMovie("C:\\Users\\avina\\Desktop\\AI Program\\Images\\ironman3.gif")
-        self.ui.label_8.setMovie(self.ui.movie)
-        self.ui.movie.start()
-        self.ui.movie = QtGui.QMovie("C:\\Users\\avina\\Desktop\\AI Program\\Images\\circle.gif")
-        self.ui.label_9.setMovie(self.ui.movie)
-        self.ui.movie.start()
-        self.ui.movie = QtGui.QMovie("C:\\Users\\avina\\Desktop\\AI Program\\Images\\powersource.gif")
-        self.ui.label_12.setMovie(self.ui.movie)
-        self.ui.movie.start()
-        self.ui.movie = QtGui.QMovie("C:\\Users\\avina\\Desktop\\AI Program\\Images\\powersource.gif")
-        self.ui.label_13.setMovie(self.ui.movie)
-        self.ui.movie.start()
-        self.ui.movie = QtGui.QMovie("C:\\Users\\avina\\Desktop\\AI Program\\Images\\ironman3_flipped.gif")
-        self.ui.label_16.setMovie(self.ui.movie)
-        self.ui.movie.start()
-        self.ui.movie = QtGui.QMovie("C:\\Users\\avina\\Desktop\\AI Program\\Images\\")
-        self.ui.label_17.setMovie(self.ui.movie)
-        self.ui.movie.start()
-        timer = QTimer(self)
-        timer.timeout.connect(self.showTime)
-        timer.start(1000)
-        startExecution.start()
-    
-    def showTime(self):
-        current_time = QTime.currentTime()
-        current_date = QDate.currentDate()
-        label_time = current_time.toString('hh:mm:ss')
-        label_date = current_date.toString(Qt.ISODate)
-        self.ui.textBrowser.setText(label_date)
-        self.ui.textBrowser_2.setText(label_time)
-
 app = QApplication(sys.argv)
 jarvis = Main()
 jarvis.show()
