@@ -13,29 +13,14 @@ import webbrowser
 import time
 import os
 import cv2
-
-from requests import get
-from requests.api import request
 import smtplib
 import psutil
-import instaloader
 import pyautogui
-from PIL import ImageGrab
 import numpy as np 
 from bs4 import BeautifulSoup
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import QTimer,QTime,QDate,Qt
-from PyQt5.QtGui import QMovie
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.uic import loadUiType
-from JarvisUi import Ui_JarvisUI
 from state import state
-from pywikihow import search_wikihow
 import speedtest
 from pytube import YouTube
-import qrcode
 from keyboard import press
 from keyboard import write
 
@@ -396,10 +381,6 @@ class MainThread(QThread):
         temp = data.find("div",class_="BNeawe").text
         self.talk(f"current {search} is {temp}")
     
-   
-     
-      
-
     # Mobile camera
     def Mobilecamera(self):
         import urllib.request
@@ -433,147 +414,7 @@ class MainThread(QThread):
                 break
         cap.release()
         cv2.destroyAllWindows()
-
     
-
-    #covid 
-    def Covid(self,s):
-        try:
-            from covid_india import states
-            details = states.getdata()
-            if "check in" in s:
-                s = s.replace("check in","").strip()
-                print(s)
-            elif "check" in s:
-                s = s.replace("check","").strip()
-                print(s)
-            elif "tech" in s:
-                s = s.replace("tech","").strip()
-            s = state[s]
-            ss = details[s]
-            Total = ss["Total"]
-            Active = ss["Active"]
-            Cured = ss["Cured"]
-            Death = ss["Death"]
-            print(f"Boss the total cases in {s} are {Total}, the number of active cases are {Active}, and {Cured} people cured, and {Death} people are death")
-            self.talk(f"Boss the total cases in {s} are {Total}, the number of active cases are {Active}, and {Cured} people cured, and {Death} people are death")
-            time.sleep(5)
-            self.talk("Boss do you want any information of other states")
-            I = self.take_Command()
-            print(I)
-            if ("check" in I):
-                self.Covid(I)
-            elif("no" in I):
-                self.talk("Okay boss stay home stay safe")
-            else:
-                self.talk("Okay boss stay home stay safe")
-        except:
-            self.talk("Boss some error occured, please try again")
-            self.talk("Boss do you want any information of other states")
-            I = self.take_Command()
-            if("yes" in I):
-                self.talk("boss, Which state covid status do u want to check")
-                Sta = self.take_Command()
-                self.Covid(Sta)
-            elif("no" in I):
-                self.talk("Okay boss stay home stay safe")
-            else:
-                self.talk("Okay boss stay home stay safe")
-
-
-
-    #Whatsapp
-    def whatsapp(self,command):
-        try:
-            command = command.replace('send a message to','')
-            command = command.strip()
-            name,numberID,F = self.SearchCont(command)
-            if F:
-                print(numberID)
-                self.talk(f'Boss, what message do you want to send to {name}')
-                message = self.take_Command()
-                hour = int(datetime.datetime.now().hour)
-                min = int(datetime.datetime.now().minute)
-                print(hour,min)
-                
-                if "group" in command:
-                    kit.sendwhatmsg_to_group(numberID,message,int(hour),int(min)+1)
-                else:
-                    kit.sendwhatmsg(numberID,message,int(hour),int(min)+1)
-
-                    press('enter')
-                self.talk("Boss message have been sent")
-            if F==False:
-                self.talk(f'Boss, the name not found in our data base, shall I add the contact')
-                AddOrNot = self.take_Command()
-                print(AddOrNot)
-                if ("yes" in AddOrNot) or ("add" in AddOrNot) or ("yeah" in AddOrNot) or ("yah" in AddOrNot):
-                    self.AddContact()
-                elif("no" in AddOrNot):
-                    self.talk('Ok Boss')
-        except:
-            print("Error occured, please try again")
-
-    
-    #Add contacts
-    def AddContact(self):
-        self.talk(f'Boss, Enter the contact details')
-        name = input("Enter the name :").lower()
-        number = input("Enter the number :")
-        NumberFormat = f'"{name}":"+91{number}"'
-        ContFile = open("Contacts.txt", "a") 
-        ContFile.write(f"{NumberFormat}\n")
-        ContFile.close()
-        self.talk(f'Boss, Contact Saved Successfully')
-
-    #Search Contact
-    def SearchCont(self,name):
-        with open("Contacts.txt","r") as ContactsFile:
-            for line in ContactsFile:
-                if name in line:
-                    print("Name Match Found")
-                    s = line.split("\"")
-                    return s[1],s[3],True
-        return 0,0,False
-    
-    #Display all contacts
-    def Display(self):
-        ContactsFile = open("Contacts.txt","r")
-        count=0
-        for line in ContactsFile:
-            count+=1
-        ContactsFile.close()
-        ContactsFile = open("Contacts.txt","r")
-        self.talk(f"Boss displaying the {count} contacts stored in our data base")    
-        for line in ContactsFile:
-            s = line.split("\"")
-            print("Name: "+s[1])
-            print("Number: "+s[3])
-        ContactsFile.close()
-
-    #search contact
-    def NameIntheContDataBase(self,command):
-        line = command
-        line = line.split("number in contacts")[0]
-        if("tell me" in line):
-            name = line.split("tell me")[1]
-            name = name.strip()
-        else:
-            name= line.strip()
-        name,number,bo = self.SearchCont(name)
-        if bo:
-            print(f"Contact Match Found in our data base with {name} and the mboile number is {number}")
-            self.talk(f"Boss Contact Match Found in our data base with {name} and the mboile number is {number}")
-        else:
-            self.talk("Boss the name not found in our data base, shall I add the contact")
-            AddOrNot = self.take_Command()
-            print(AddOrNot)
-            if ("yes add it" in AddOrNot)or ("yeah" in AddOrNot) or ("yah" in AddOrNot):
-                self.AddContact()
-                self.talk(f'Boss, Contact Saved Successfully')
-            elif("no" in AddOrNot) or ("don't add" in AddOrNot):
-                self.talk('Ok Boss')
-
     #Internet speed
     def InternetSpeed(self):
         self.talk("Wait a few seconds boss, checking your internet speed")
@@ -586,27 +427,6 @@ class MainThread(QThread):
         self.talk(f"Boss, we have {dl} megabytes per second downloading speed and {up} megabytes per second uploading speed")
         
 
-
-    #Search for a process how to do
-    def How(self):
-        self.talk("How to do mode is is activated")
-        while True:
-            self.talk("Please tell me what you want to know")
-            how = self.take_Command()
-            try:
-                if ("exit" in how) or("close" in how):
-                    self.talk("Ok sir how to mode is closed")
-                    break
-                else:
-                    max_result=1
-                    how_to = search_wikihow(how,max_result)
-                    assert len(how_to) == 1
-                    how_to[0].print()
-                    self.talk(how_to[0].summary)
-            except Exception as e:
-                self.talk("Sorry sir, I am not able to find this")
-
-
     #Communication commands
     def comum(self,command):
         print(command)
@@ -614,8 +434,6 @@ class MainThread(QThread):
             self.talk("Hello boss what can I help for u")
         else :
             self.No_result_found()
-
-
 
     #Fun commands to interact with jarvis
     def Fun(self,command):
@@ -673,7 +491,6 @@ class MainThread(QThread):
         else :
             self.No_result_found()
         
-
     #clock commands
     def Clock_time(self,command):
         print(command)
@@ -681,8 +498,6 @@ class MainThread(QThread):
         print(time)
         self.talk("Current time is "+time)
     
-
-
     #calender day
     def Cal_day(self):
         day = datetime.datetime.today().weekday() + 1
@@ -692,23 +507,6 @@ class MainThread(QThread):
             print(day_of_the_week)
         
         return day_of_the_week
-
-
-    #shedule function for remembering todays plans
-    def shedule(self):
-        day = self.Cal_day().lower()
-        self.talk("Boss today's shedule is")
-        Week = {"monday" : "Boss from 9:00 to 9:50 you have Cultural class, from 10:00 to 11:50 you have mechanics class, from 12:00 to 2:00 you have brake, and today you have sensors lab from 2:00",
-        "tuesday" : "Boss from 9:00 to 9:50 you have English class, from 10:00 to 10:50 you have break,from 11:00 to 12:50 you have ELectrical class, from 1:00 to 2:00 you have brake, and today you have biology lab from 2:00",
-        "wednesday" : "Boss today you have a full day of classes from 9:00 to 10:50 you have Data structures class, from 11:00 to 11:50 you have mechanics class, from 12:00 to 12:50 you have cultural class, from 1:00 to 2:00 you have brake, and today you have Data structures lab from 2:00",
-        "thrusday" : "Boss today you have a full day of classes from 9:00 to 10:50 you have Maths class, from 11:00 to 12:50 you have sensors class, from 1:00 to 2:00 you have brake, and today you have english lab from 2:00",
-        "friday" : "Boss today you have a full day of classes from 9:00 to 9:50 you have Biology class, from 10:00 to 10:50 you have data structures class, from 11:00 to 12:50 you have Elements of computing class, from 1:00 to 2:00 you have brake, and today you have Electronics lab from 2:00",
-        "saturday" : "Boss today you have a full day of classes from 9:00 to 11:50 you have maths lab, from 12:00 to 12:50 you have english class, from 1:00 to 2:00 you have brake, and today you have elements of computing lab from 2:00",
-        "sunday":"Boss today is holiday but we can't say anything when they will bomb with any assisgnments"}
-        if day in Week.keys():
-            self.talk(Week[day])
-
-
 
     #college resources commands
     def college(self,command):
@@ -989,46 +787,8 @@ class MainThread(QThread):
         server.login("avinashmayank1372001@gmail.com","Avinash@13072001")
         server.sendmail("avinashmayank1372001@gmail.com",to,content)
         server.close()
+    
 
-    #location
-    def locaiton(self):
-        self.talk("Wait boss, let me check")
-        try:
-            IP_Address = get('https://api.ipify.org').text
-            print(IP_Address)
-            url = 'https://get.geojs.io/v1/ip/geo/'+IP_Address+'.json'
-            print(url)
-            geo_reqeust = get(url)
-            geo_data = geo_reqeust.json()
-            city = geo_data['city']
-            state = geo_data['region']
-            country = geo_data['country']
-            tZ = geo_data['timezone']
-            longitude = geo_data['longitude']
-            latidute = geo_data['latitude']
-            org = geo_data['organization_name']
-            print(city+" "+state+" "+country+" "+tZ+" "+longitude+" "+latidute+" "+org)
-            self.talk(f"Boss i am not sure, but i think we are in {city} city of {state} state of {country} country")
-            self.talk(f"and boss, we are in {tZ} timezone the latitude os our location is {latidute}, and the longitude of our location is {longitude}, and we are using {org}\'s network ")
-        except Exception as e:
-            self.talk("Sorry boss, due to network issue i am not able to find where we are.")
-            pass
-
-    #Instagram profile
-    def Instagram_Pro(self):
-        self.talk("Boss please enter the user name of Instagram: ")
-        name = input("Enter username here: ")
-        webbrowser.open(f"www.instagram.com/{name}")
-        time.sleep(5)
-        self.talk("Boss would you like to download the profile picture of this account.")
-        cond = self.take_Command()
-        
-        if('download' in cond) or ('ok' in cond):
-            mod = instaloader.Instaloader()
-            mod.download_profile(name,profile_pic_only=True)
-            self.talk("I am done boss, profile picture is saved in your main folder. ")
-        else:
-            pass
 
     #ScreenShot
     def scshot(self):
@@ -1039,20 +799,6 @@ class MainThread(QThread):
         img = pyautogui.screenshot()
         img.save(f"{name}.png")
         self.talk("I am done boss, the screenshot is saved in main folder.")
-
-    #News
-    def news(self):
-        MAIN_URL_= " https://newsapi.org/v2/top-headlines?country=in&apiKey=370b2f61df874ae0bc260355a9f61e84"
-        MAIN_PAGE_ = get(MAIN_URL_).json()
-        articles = MAIN_PAGE_["articles"]
-        headings=[]
-        seq = ['first','second','third','fourth','fifth','sixth','seventh','eighth','ninth','tenth'] #If you need more than ten you can extend it in the list
-        for ar in articles:
-            headings.append(ar['title'])
-        for i in range(len(seq)):
-            print(f"todays {seq[i]} news is: {headings[i]}")
-            self.talk(f"todays {seq[i]} news is: {headings[i]}")
-        self.talk("Boss I am done, I have read most of the latest news")
 
 
     #System condition
